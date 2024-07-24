@@ -40,7 +40,7 @@ const UserPage = () => {
 
   const logoutUser = () => {
     localStorage.removeItem('token');
-    navigate('/'); // Updated from history.push
+    navigate('/'); 
   };
 
   const handleUsernameChange = (e) => {

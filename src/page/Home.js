@@ -3,13 +3,13 @@ import 'font-awesome/css/font-awesome.min.css';
 import FeatureItem from '../component/Featureitem';
 import Subtitle from '../component/Subtitle';
 
-
 import iconChat from '../assets/icon-chat.webp';
 import iconMoney from '../assets/icon-money.webp';
 import iconSecurity from '../assets/icon-security.webp';
 
 const HomePage = () => {
-  const [setUser] = useState(null);
+  // Correctly declare user state and setUser function
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
