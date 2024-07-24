@@ -1,0 +1,11 @@
+import React from 'react';
+
+const FeatureItem = ({ imgSrc, imgAlt, title, description }) => (
+  <div className="feature-item">
+    <img src={imgSrc} alt={imgAlt} className="feature-icon" />
+    <h3 className="feature-item-title">{title}</h3>
+    <p>{description}</p>
+  </div>
+);
+
+export default FeatureItem;
