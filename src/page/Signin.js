@@ -32,41 +32,38 @@ const SignIn = () => {
   };
 
   return (
-    <div>
-      <main className="main bg-dark">
-        <section className="sign-in-content">
-          <i className="fa fa-user-circle sign-in-icon"></i>
-          <h1>Sign In</h1>
-          <form id="signInForm" ref={form} onSubmit={handleSubmit}>
-            <div className="input-wrapper">
-              <label htmlFor="email">Email</label>
-              <input
-                type="text"
-                id="email"
-                required
-              />
-            </div>
-            <div className="input-wrapper">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                required
-              />
-            </div>
-            <div className="input-remember">
-              <input type="checkbox" id="remember-me" />
-              <label htmlFor="remember-me">Remember me</label>
-            </div>
-            <button type="submit" className="sign-in-button">Sign In</button>
-          </form>
-          <p>{error}</p>
-        </section>
-      </main>
-      <footer className="footer">
-        <p className="footer-text">Copyright 2020 Argent Bank</p>
-      </footer>
-    </div>
+
+    <main className="bg-dark">
+      <section className="sign-in-content">
+        <i className="fa fa-user-circle sign-in-icon"></i>
+        <h1>Sign In</h1>
+        <form id="signInForm" ref={form} onSubmit={handleSubmit}>
+          <div className="input-wrapper">
+            <label htmlFor="email">Email</label>
+            <input
+              type="text"
+              id="email"
+              required
+            />
+          </div>
+          <div className="input-wrapper">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              required
+            />
+          </div>
+          <div className="input-remember">
+            <input type="checkbox" id="remember-me" />
+            <label htmlFor="remember-me">Remember me</label>
+          </div>
+          <button type="submit" className="sign-in-button">Sign In</button>
+        </form>
+        <p>{error}</p>
+      </section>
+    </main>
+
   );
 };
 

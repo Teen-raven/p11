@@ -12,8 +12,8 @@ const UserPage = () => {
   const user = useSelector(selectUser);
   const navigate = useNavigate();
 
-  const [newUsername, setNewUsername] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
+  const [username, setUsername] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -31,17 +31,17 @@ const UserPage = () => {
   }, [token, dispatch, navigate]);
 
   const handleUsernameChange = (e) => {
-    setNewUsername(e.target.value);
+    setUsername(e.target.value);
   };
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
 
-    putUsername(token, newUsername)
+    putUsername(token, username)
       .then(data => {
         dispatch(setUser(data.body));
-        setModalVisible(false);
-        setNewUsername('');
+        setIsEditing(false);
+        setUsername('');
       })
       .catch(error => {
         console.error('Error:', error.message);
@@ -49,62 +49,82 @@ const UserPage = () => {
   };
 
   return (
-    <div>
-      <main className="main bg-dark">
-        <div className="header">
-          <h1>
-            Welcome back<br />
-            <span id="user-fullname">{user?.firstName} {user?.lastName}</span>!
-          </h1>
-          <button id="openModalBtn" onClick={() => setModalVisible(true)}>Edit Username</button>
-        </div>
-        <h2 className="sr-only">Accounts</h2>
-        <AccountSection 
-          title="Argent Bank Checking (x8349)"
-          amount="$2,082.79"
-          description="Available Balance"
-          accountType="checking"
-        />
-        <AccountSection 
-          title="Argent Bank Savings (x6712)"
-          amount="$10,928.42"
-          description="Available Balance"
-          accountType="savings"
-        />
-        <AccountSection 
-          title="Argent Bank Credit Card (x8349)"
-          amount="$184.30"
-          description="Current Balance"
-          accountType="credit-card"
-        />
-      </main>
-      <footer className="footer">
-        <p className="footer-text">Copyright 2020 Argent Bank</p>
-      </footer>
-      {modalVisible && (
-  <div id="myModal" className="modal" aria-modal="true" role="dialog">
-    <div className="modal-content">
-      <span className="close" onClick={() => setModalVisible(false)}>&times;</span>
-      <h3 className="Edittitle">Edit User Information</h3>
-      <form id="editUsernameForm" onSubmit={handleEditSubmit}>
-        <div className="form-group">
-          <label htmlFor="firstName">First Name</label>
-          <input type="text" id="firstName" name="firstName" value={user?.firstName} readOnly />
-        </div>
-        <div className="form-group">
-          <label htmlFor="lastName">Last Name</label>
-          <input type="text" id="lastName" name="lastName" value={user?.lastName} readOnly />
-        </div>
-        <div className="form-group">
-          <label htmlFor="newUsername">New Username</label>
-          <input type="text" id="newUsername" value={newUsername} onChange={handleUsernameChange} placeholder="Enter new username" />
-        </div>
-        <button type="submit">Save</button>
-      </form>
-    </div>
-  </div>
-)}
-    </div>
+    <main className="bg-dark">
+      <div className="header welcome">
+        <h1>
+          Welcome back<br />
+          <span id="user-fullname">{user?.firstName} {user?.lastName}</span>!
+        </h1>
+
+        {!isEditing && (<button id="openModalBtn" onClick={() => setIsEditing(true)}>Edit Username</button>)}
+
+        
+        {isEditing && (
+          <form
+            id="changeUserData"
+            onSubmit={(e) => handleEditSubmit(e)}
+          >
+            <div className="input-wrapper">
+              <label htmlFor="username">User name:</label>
+              <input type="text" id="username" onChange={handleUsernameChange} placeholder={user?.userName} />
+            </div>
+            <div className="input-wrapper">
+              <label htmlFor="firstname">First Name:</label>
+              <input
+                type="text"
+                id="firstname"
+                disabled
+                readOnly
+                value={user?.firstName}
+              />
+            </div>
+            <div className="input-wrapper">
+              <label htmlFor="lastname">Last Name:</label>
+              <input
+                type="text"
+                id="lastname"
+                disabled
+                readOnly
+                value={user?.lastName}
+              />
+            </div>
+            <div className="input-wrapper">
+              <button className="sign-in-button" type="submit">
+                Save
+              </button>
+              <button
+                className="sign-in-button"
+                type="reset"
+                onClick={() => setIsEditing(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+
+
+      </div>
+      <h2 className="sr-only">Accounts</h2>
+      <AccountSection
+        title="Argent Bank Checking (x8349)"
+        amount="$2,082.79"
+        description="Available Balance"
+        accountType="checking"
+      />
+      <AccountSection
+        title="Argent Bank Savings (x6712)"
+        amount="$10,928.42"
+        description="Available Balance"
+        accountType="savings"
+      />
+      <AccountSection
+        title="Argent Bank Credit Card (x8349)"
+        amount="$184.30"
+        description="Current Balance"
+        accountType="credit-card"
+      />
+    </main>
   );
 };
 

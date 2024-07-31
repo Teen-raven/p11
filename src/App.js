@@ -6,19 +6,19 @@ import HomePage from './page/Home';
 import SignIn from './page/Signin';
 import UserPage from './page/User';
 import Navbar from './component/Navbar';
+import Footer from './component/Footer';
 
 const App = () => {
   return (
     <Provider store={store}>
       <Router>
-        <div>
-          <Navbar />
-          <Routes>
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/user" element={<UserPage />} />
-            <Route path="/" element={<HomePage />} />
-          </Routes>
-        </div>
+        <Navbar />
+        <Routes>
+          <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/user" element={<UserPage />} />
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+        <Footer />
       </Router>
     </Provider>
   );

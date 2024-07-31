@@ -1,21 +1,13 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import 'font-awesome/css/font-awesome.min.css';
 import argentBankLogo from '../assets/argentBankLogo.webp';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUser, setUser } from '../redux/authSlice'; 
+import { selectUser, logout } from '../redux/authSlice';
 
 const Navbar = () => {
-  const user = useSelector(selectUser); 
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const handleSignOut = (e) => {
-    e.preventDefault();
-    localStorage.removeItem('token'); 
-    dispatch(setUser(null)); 
-    navigate('/sign-in');
-  };
 
   return (
     <nav className="main-nav">
@@ -27,10 +19,11 @@ const Navbar = () => {
         {user ? (
           <>
             <Link className="main-nav-item" to="/user">
+              <span id="user-fullname">{user.userName}</span>
+              &nbsp;
               <i className="fa fa-user-circle"></i>
-              <span id="user-fullname">{user.firstName} {user.lastName}</span>
             </Link>
-            <Link className="main-nav-item" to="/sign-in" onClick={handleSignOut}>
+            <Link className="main-nav-item" to="/" onClick={() => dispatch(logout())}>
               <i className="fa fa-sign-out"></i>
               <span id="sign-out">Sign Out</span>
             </Link>
@@ -38,6 +31,7 @@ const Navbar = () => {
         ) : (
           <Link className="main-nav-item" to="/sign-in">
             <i className="fa fa-user-circle"></i>
+            &nbsp;
             <span id="user-fullname">Sign In</span>
           </Link>
         )}
