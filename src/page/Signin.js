@@ -1,39 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'font-awesome/css/font-awesome.min.css';
+import { postLogin } from '../redux/authApi';
+import { useDispatch } from 'react-redux';
+import { setToken } from '../redux/authSlice';
 
 const SignIn = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate(); 
+  const [error, setError] = useState('')
+  const navigate = useNavigate();
+  const form = useRef()
+  const dispatch = useDispatch()
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    fetch('http://localhost:3001/api/v1/user/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Invalid credentials');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.body && data.body.token) {
-          localStorage.setItem('token', data.body.token);
-          navigate('/user');
+    const userInfo = {
+      email: form.current[0].value,
+      password: form.current[1].value
+    }
+
+    postLogin(userInfo)
+      .then(data => {
+        if (data.body) {
+          dispatch(setToken(data.body.token))
+          navigate('/user')
         } else {
-          throw new Error('Token not found in response');
+          setError(data.message)
         }
-      })
-      .catch((error) => {
-        console.error('Error:', error.message);
-      });
+      }).catch(error => setError(error.message || error))
+
   };
 
   return (
@@ -42,14 +37,12 @@ const SignIn = () => {
         <section className="sign-in-content">
           <i className="fa fa-user-circle sign-in-icon"></i>
           <h1>Sign In</h1>
-          <form id="signInForm" onSubmit={handleSubmit}>
+          <form id="signInForm" ref={form} onSubmit={handleSubmit}>
             <div className="input-wrapper">
               <label htmlFor="email">Email</label>
               <input
                 type="text"
                 id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -58,8 +51,6 @@ const SignIn = () => {
               <input
                 type="password"
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
@@ -69,6 +60,7 @@ const SignIn = () => {
             </div>
             <button type="submit" className="sign-in-button">Sign In</button>
           </form>
+          <p>{error}</p>
         </section>
       </main>
       <footer className="footer">

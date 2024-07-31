@@ -1,45 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import 'font-awesome/css/font-awesome.min.css';
 import argentBankLogo from '../assets/argentBankLogo.webp';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectUser, setUser } from '../redux/authSlice'; 
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
+  const user = useSelector(selectUser); 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetch('http://localhost:3001/api/v1/user/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to fetch user profile');
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.body) {
-            setUser(data.body);
-          } else {
-            throw new Error('User data not found in response');
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching user profile:', error.message);
-        });
-    }
-  }, []);
 
   const handleSignOut = (e) => {
     e.preventDefault();
-    localStorage.removeItem('token');
-    setUser(null);
+    localStorage.removeItem('token'); 
+    dispatch(setUser(null)); 
     navigate('/sign-in');
   };
 
@@ -73,3 +47,6 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+
+

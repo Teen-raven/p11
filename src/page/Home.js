@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
 import FeatureItem from '../component/Featureitem';
 import Subtitle from '../component/Subtitle';
@@ -8,38 +7,6 @@ import iconMoney from '../assets/icon-money.webp';
 import iconSecurity from '../assets/icon-security.webp';
 
 const HomePage = () => {
-  // Correctly declare user state and setUser function
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    if (token) {
-      fetch('http://localhost:3001/api/v1/user/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to fetch user profile');
-          }
-          return response.json();
-        })
-        .then((data) => {
-          if (data.body) {
-            setUser(data.body);
-          } else {
-            throw new Error('User data not found in response');
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching user profile:', error.message);
-        });
-    }
-  }, []);
 
   return (
     <div>

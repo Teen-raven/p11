@@ -1,47 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useEffect, useState } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectToken, selectUser, setUser } from '../redux/authSlice';
+import { postUser, putUsername } from '../redux/authApi';
+import { useNavigate } from 'react-router-dom';
+import AccountSection from '../component/Accountsection';
 
 const UserPage = () => {
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const token = useSelector(selectToken);
+  const user = useSelector(selectUser);
+  const navigate = useNavigate();
+
   const [newUsername, setNewUsername] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const navigate = useNavigate(); 
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    if (token) {
-      fetch('http://localhost:3001/api/v1/user/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to fetch user profile');
-          }
-          return response.json();
+    if (!token) {
+      navigate('/sign-in');
+    } else {
+      postUser(token)
+        .then(data => {
+          dispatch(setUser(data.body));
         })
-        .then((data) => {
-          if (data.body) {
-            setUser(data.body);
-          } else {
-            throw new Error('User data not found in response');
-          }
-        })
-        .catch((error) => {
+        .catch(error => {
           console.error('Error:', error.message);
+          navigate('/sign-in');
         });
     }
-  }, []);
-
-  const logoutUser = () => {
-    localStorage.removeItem('token');
-    navigate('/'); 
-  };
+  }, [token, dispatch, navigate]);
 
   const handleUsernameChange = (e) => {
     setNewUsername(e.target.value);
@@ -49,32 +36,14 @@ const UserPage = () => {
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
 
-    fetch('http://localhost:3001/api/v1/user/profile', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ userName: newUsername }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to update username');
-        }
-        return response.json();
+    putUsername(token, newUsername)
+      .then(data => {
+        dispatch(setUser(data.body));
+        setModalVisible(false);
+        setNewUsername('');
       })
-      .then((data) => {
-        if (data.body) {
-          setUser(data.body);
-          setModalVisible(false);
-          setNewUsername('');
-        } else {
-          throw new Error('User data not found in response');
-        }
-      })
-      .catch((error) => {
+      .catch(error => {
         console.error('Error:', error.message);
       });
   };
@@ -90,63 +59,51 @@ const UserPage = () => {
           <button id="openModalBtn" onClick={() => setModalVisible(true)}>Edit Username</button>
         </div>
         <h2 className="sr-only">Accounts</h2>
-        <section className="account">
-          <div className="account-content-wrapper">
-            <h3 className="account-title">Argent Bank Checking (x8349)</h3>
-            <p className="account-amount">$2,082.79</p>
-            <p className="account-amount-description">Available Balance</p>
-          </div>
-          <div className="account-content-wrapper cta">
-            <button className="transaction-button">View transactions</button>
-          </div>
-        </section>
-        <section className="account">
-          <div className="account-content-wrapper">
-            <h3 className="account-title">Argent Bank Savings (x6712)</h3>
-            <p className="account-amount">$10,928.42</p>
-            <p className="account-amount-description">Available Balance</p>
-          </div>
-          <div className="account-content-wrapper cta">
-            <button className="transaction-button">View transactions</button>
-          </div>
-        </section>
-        <section className="account">
-          <div className="account-content-wrapper">
-            <h3 className="account-title">Argent Bank Credit Card (x8349)</h3>
-            <p className="account-amount">$184.30</p>
-            <p className="account-amount-description">Current Balance</p>
-          </div>
-          <div className="account-content-wrapper cta">
-            <button className="transaction-button">View transactions</button>
-          </div>
-        </section>
+        <AccountSection 
+          title="Argent Bank Checking (x8349)"
+          amount="$2,082.79"
+          description="Available Balance"
+          accountType="checking"
+        />
+        <AccountSection 
+          title="Argent Bank Savings (x6712)"
+          amount="$10,928.42"
+          description="Available Balance"
+          accountType="savings"
+        />
+        <AccountSection 
+          title="Argent Bank Credit Card (x8349)"
+          amount="$184.30"
+          description="Current Balance"
+          accountType="credit-card"
+        />
       </main>
       <footer className="footer">
         <p className="footer-text">Copyright 2020 Argent Bank</p>
       </footer>
       {modalVisible && (
-        <div id="myModal" className="modal" aria-modal="true" role="dialog">
-          <div className="modal-content">
-            <span className="close" onClick={() => setModalVisible(false)}>&times;</span>
-            <h3 className="Edittitle">Edit User Information</h3>
-            <form id="editUsernameForm" onSubmit={handleEditSubmit}>
-              <div className="form-group">
-                <label htmlFor="firstName">First Name</label>
-                <input type="text" id="firstName" name="firstName" value={user?.firstName} readOnly />
-              </div>
-              <div className="form-group">
-                <label htmlFor="lastName">Last Name</label>
-                <input type="text" id="lastName" name="lastName" value={user?.lastName} readOnly />
-              </div>
-              <div className="form-group">
-                <label htmlFor="newUsername">New Username</label>
-                <input type="text" id="newUsername" value={newUsername} onChange={handleUsernameChange} placeholder="Enter new username" />
-              </div>
-              <button type="submit">Save</button>
-            </form>
-          </div>
+  <div id="myModal" className="modal" aria-modal="true" role="dialog">
+    <div className="modal-content">
+      <span className="close" onClick={() => setModalVisible(false)}>&times;</span>
+      <h3 className="Edittitle">Edit User Information</h3>
+      <form id="editUsernameForm" onSubmit={handleEditSubmit}>
+        <div className="form-group">
+          <label htmlFor="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" value={user?.firstName} readOnly />
         </div>
-      )}
+        <div className="form-group">
+          <label htmlFor="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" value={user?.lastName} readOnly />
+        </div>
+        <div className="form-group">
+          <label htmlFor="newUsername">New Username</label>
+          <input type="text" id="newUsername" value={newUsername} onChange={handleUsernameChange} placeholder="Enter new username" />
+        </div>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+)}
     </div>
   );
 };
